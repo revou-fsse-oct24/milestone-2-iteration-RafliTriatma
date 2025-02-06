@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Card from '@/components/Card';
 import Navbar from '@/components/Navbar';
+import { GetServerSideProps } from 'next';
 
 interface Category {
   id: number;
@@ -15,26 +16,18 @@ interface Product {
   images: string[];
 }
 
-const Homepage: React.FC = () => {
-  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [error, setError] = useState<string | null>(null);
+interface HomepageProps {
+  initialCategories: Category[];
+  initialProducts: Product[];
+  initialError: string | null;
+}
 
-  const fetchCategories = async () => {
-    try {
-      const response = await fetch('https://api.escuelajs.co/api/v1/categories');
-      if (!response.ok) {
-        throw new Error('Failed to fetch categories');
-      }
-      const data: Category[] = await response.json();
-      setCategories(data);
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-      setError('Error fetching categories. Please try again later.');
-    }
-  };
+const Homepage: React.FC<HomepageProps> = ({ initialCategories, initialProducts, initialError }) => {
+  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
+  const [products, setProducts] = useState<Product[]>(initialProducts);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [categories, setCategories] = useState<Category[]>(initialCategories);
+  const [error, setError] = useState<string | null>(initialError);
 
   const fetchProductsByCategory = async (categoryId: number | null) => {
     setLoading(true);
@@ -58,19 +51,12 @@ const Homepage: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  useEffect(() => {
-    fetchProductsByCategory(selectedCategory);
-  }, [selectedCategory]);
-
   const handleCategoryClick = (categoryId: number | null) => {
     if (selectedCategory === categoryId) {
       return;
     }
     setSelectedCategory(categoryId);
+    fetchProductsByCategory(categoryId);
   };
 
   return (
@@ -111,6 +97,39 @@ const Homepage: React.FC = () => {
       </div>
     </>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  try {
+    const categoryResponse = await fetch('https://api.escuelajs.co/api/v1/categories');
+    if (!categoryResponse.ok) {
+      throw new Error('Failed to fetch categories');
+    }
+    const categories: Category[] = await categoryResponse.json();
+
+    const productResponse = await fetch('https://api.escuelajs.co/api/v1/products');
+    if (!productResponse.ok) {
+      throw new Error('Failed to fetch products');
+    }
+    const products: Product[] = await productResponse.json();
+
+    return {
+      props: {
+        initialCategories: categories,
+        initialProducts: products,
+        initialError: null,
+      },
+    };
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    return {
+      props: {
+        initialCategories: [],
+        initialProducts: [],
+        initialError: 'Error fetching data. Please try again later.',
+      },
+    };
+  }
 };
 
 export default Homepage;
