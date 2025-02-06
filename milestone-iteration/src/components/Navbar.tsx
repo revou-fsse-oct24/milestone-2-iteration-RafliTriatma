@@ -11,6 +11,7 @@ interface User {
 
 const Navbar: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
+  const [cartItemCount, setCartItemCount] = useState<number>(0);
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -31,6 +32,14 @@ const Navbar: React.FC = () => {
     };
 
     fetchUserData();
+
+    const fetchCartItems = () => {
+      const existingCart = localStorage.getItem('cart');
+      const cart = existingCart ? JSON.parse(existingCart) : [];
+      setCartItemCount(cart.length);
+    };
+
+    fetchCartItems();
   }, []);
 
   const handleLogout = () => {
@@ -44,6 +53,32 @@ const Navbar: React.FC = () => {
       <div className='flex justify-between items-center'>
         {/* Logo */}
         <h1 className='text-white'>LOGO</h1>
+
+        {/* Cart Icon */}
+        <div className="relative">
+          <Link href="/cart" passHref>
+            <svg
+              className="w-8 h-8 text-white cursor-pointer"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 9m0-9h12m-6 6h.01M7 21h10m-3-6h-4"
+              ></path>
+            </svg>
+          </Link>
+          {cartItemCount > 0 && (
+            <span className="absolute top-0 right-0 bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+              {cartItemCount}
+            </span>
+          )}
+        </div>
+
 
         {/* Display Information Login */}
         {!loading && user ? (
@@ -62,6 +97,8 @@ const Navbar: React.FC = () => {
             Login
           </Link>
         )}
+
+        
       </div>
     </div>
   );
