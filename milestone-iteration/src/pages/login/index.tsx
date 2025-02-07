@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
+import Link from "next/link";
 import { useRouter } from 'next/router';
 import { GetServerSideProps } from 'next';
 
@@ -82,9 +83,9 @@ const LoginForm = () => {
 
           <p className="mt-10 text-center text-sm text-gray-500">
             Didn't Have Account?
-            <a href="/register" className="text-indigo-600 hover:text-indigo-500 ml-1">
+            <Link href="/register" className="text-indigo-600 hover:text-indigo-500 ml-1">
               Register
-            </a>
+            </Link>
           </p>
         </div>
       </div>

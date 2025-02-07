@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
+import Link from "next/link";
 import { createUser } from '@/services/RegisterApi';
 
 const RegisterForm: React.FC = () => {
@@ -135,9 +136,9 @@ const RegisterForm: React.FC = () => {
 
         <p className="mt-10 text-center text-sm text-gray-500">
           Already have an account?{' '}
-          <a href="/login" className="font-semibold text-indigo-600 hover:text-indigo-500">
+          <Link href="/login" className="font-semibold text-indigo-600 hover:text-indigo-500">
             Login
-          </a>
+          </Link>
         </p>
       </div>
     </div>
