@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 interface Product {
   id: number;
@@ -54,7 +55,14 @@ const Cart: React.FC = () => {
       <h2 className="text-2xl font-bold mb-6">Shopping Cart</h2>
 
       {cart.length === 0 ? (
-        <p>Your cart is empty.</p>
+        <div className="text-center">
+          <p className="text-gray-600">Your cart is empty.</p>
+          <Link href="/homepage">
+            <button className="mt-4 bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-500">
+              Back to Homepage
+            </button>
+          </Link>
+        </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {cart.map((product) => (
