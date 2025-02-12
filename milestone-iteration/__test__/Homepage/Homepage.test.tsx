@@ -1,6 +1,9 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import Homepage from '@/pages/homepage';
+import Navbar from '@/components/Navbar';
+import Card from '@/components/Card';
+
 
 const mockCategories = [
   { id: 1, name: 'Electronics' },
@@ -23,6 +26,44 @@ const mockProducts = [
     images: ['https://via.placeholder.com/150'],
   },
 ];
+
+describe('Navbar Component', () => {
+  test('renders navigation links', () => {
+    render(<Navbar />);
+
+    expect(screen.getByText('Home')).toBeInTheDocument();
+    expect(screen.getByText('Shop')).toBeInTheDocument();
+    expect(screen.getByText('Cart')).toBeInTheDocument();
+  });
+
+  test('navigates to different pages when links are clicked', () => {
+    render(<Navbar />);
+    
+    const homeLink = screen.getByText('Home');
+    fireEvent.click(homeLink);
+    
+    expect(window.location.pathname).toBe('/');
+  });
+});
+
+// Unit Test untuk Card Component
+describe('Card Component', () => {
+  test('renders product information correctly', () => {
+    render(<Card products={mockProducts} />);
+
+    mockProducts.forEach((product) => {
+      expect(screen.getByText(product.title)).toBeInTheDocument();
+      expect(screen.getByText(product.description)).toBeInTheDocument();
+      expect(screen.getByText(`$${product.price}`)).toBeInTheDocument();
+    });
+  });
+
+  test('displays "No products found" when product list is empty', () => {
+    render(<Card products={[]} />);
+    
+    expect(screen.getByText('No products found.')).toBeInTheDocument();
+  });
+});
 
 describe('Homepage Component', () => {
   test('renders categories and products correctly', () => {

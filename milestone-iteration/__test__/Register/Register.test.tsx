@@ -22,10 +22,15 @@ describe('RegisterForm Component', () => {
     expect(screen.getByRole('button', { name: 'Create Account' })).toBeInTheDocument();
   });
 
+  test('updates input values correctly', () => {
+    render(<RegisterForm />);
+    const nameInput = screen.getByLabelText('Full Name');
+    fireEvent.change(nameInput, { target: { value: 'John Doe' } });
+    expect(nameInput).toHaveValue('John Doe');
+  });
+
   test('shows error message when passwords do not match', async () => {
     render(<RegisterForm />);
-    fireEvent.change(screen.getByLabelText('Full Name'), { target: { value: 'John Doe' } });
-    fireEvent.change(screen.getByLabelText('Email address'), { target: { value: 'john@example.com' } });
     fireEvent.change(screen.getByLabelText('Password'), { target: { value: 'password123' } });
     fireEvent.change(screen.getByLabelText('Confirm Password'), { target: { value: 'password456' } });
     fireEvent.click(screen.getByRole('button', { name: 'Create Account' }));
@@ -62,5 +67,22 @@ describe('RegisterForm Component', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Create Account' }));
 
     expect(await screen.findByText('Registration failed. Please try again.')).toBeInTheDocument();
+  });
+
+  test('displays loading state when submitting', async () => {
+    (createUser as jest.Mock).mockResolvedValueOnce({});
+
+    render(<RegisterForm />);
+    fireEvent.change(screen.getByLabelText('Full Name'), { target: { value: 'John Doe' } });
+    fireEvent.change(screen.getByLabelText('Email address'), { target: { value: 'john@example.com' } });
+    fireEvent.change(screen.getByLabelText('Password'), { target: { value: 'password123' } });
+    fireEvent.change(screen.getByLabelText('Confirm Password'), { target: { value: 'password123' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Create Account' }));
+    
+    expect(screen.getByRole('button', { name: 'Creating account...' })).toBeInTheDocument();
+    
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'Create Account' })).toBeInTheDocument();
+    });
   });
 });
